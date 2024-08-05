@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from .config import settings
 
 
 class DBHelper:
@@ -9,7 +10,7 @@ class DBHelper:
         )
 
 
-db_helper = DBHelper()
+db_helper = DBHelper(settings.db_url, settings.echo)
 
 
 async def get_db():
