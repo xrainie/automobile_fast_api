@@ -1,5 +1,4 @@
-from operator import gt
-from pydantic import BaseModel, PastDatetime, Field
+from pydantic import BaseModel, Field
 from enum import Enum
 from datetime import datetime
 from typing import Annotated, Optional
@@ -22,27 +21,27 @@ class GearBox(str, Enum):
 class VehicleBase(BaseModel):
     brand: str
     model: str
-    year_of_issue:int = Field(gt=1800, lt=datetime.now().year, title="Год выпуска автомобиля")
-    fuel: Annotated[str, FuelTypes]
-    gearbox: Annotated[str, GearBox]
-    mileage:int = Field(gt=1, title="Пробег автомобиля")
+    year_of_issue:int = Field(gt=1949, lt=datetime.now().year)
+    fuel: FuelTypes
+    gearbox: GearBox
+    mileage:int = Field(ge=0)
 
 
 class CreateVehicleSchema(VehicleBase):
-    pass
-
-
-class VehicleSchema(VehicleBase):
-    id: int
     price: int
 
 
+class VehicleSchema(VehicleBase):
+    price: int
+    id: int
+
+
 class VehicleQueryParamsSchema(VehicleBase):
-    brand: str = None
-    model: str = None
-    year_of_issue:int = Field(gt=1949, lt=datetime.now().year, title="Год выпуска автомобиля", default=None)
-    fuel: FuelTypes = None
-    gearbox: GearBox = None
-    mileage: int = Field(ge=0, title="Пробег автомобиля", default=None)
-    min_price: int = Field(gt=0, default=None)
-    max_price: int = Field(default=None)
+    brand: str | None = None
+    model: str | None = None
+    year_of_issue:int | None = Field(gt=1949, lt=datetime.now().year, title="Год выпуска автомобиля", default=None)
+    fuel: FuelTypes | None = None
+    gearbox: GearBox | None = None
+    mileage: int | None = Field(ge=0, title="Пробег автомобиля", default=None)
+    min_price: int | None = Field(gt=0, default=None)
+    max_price: int | None = Field(default=None)
