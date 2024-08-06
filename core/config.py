@@ -10,8 +10,8 @@ PRODUCTION = False
 
 
 class Settings(BaseSettings):
-    db_url = os.environ.get("DB_URL")
-    echo = True if not PRODUCTION else False
+    db_url: str = os.environ.get("DB_URL")
+    echo: bool = True if not PRODUCTION else False
 
 
 settings = Settings()
