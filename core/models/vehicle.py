@@ -2,7 +2,7 @@ from .base import BaseModel
 from sqlalchemy.orm import Mapped
 
 
-class Vehicle(BaseModel):
+class VehicleModel(BaseModel):
     brand: Mapped[str]
     model: Mapped[str]
     year_of_issue = Mapped[int]
