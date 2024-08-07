@@ -7,11 +7,10 @@ from fastapi import Depends, HTTPException, status
 from typing import Annotated
 
 
-attrs = ["brand", "model", "year_of_issue", "fuel", "gearbox", "mileage", "min_price", "max_price"]
-
-
-async def get_vehicles(session: AsyncSession, params: Annotated[VehicleQueryParamsSchema, Depends()]):
+async def get_vehicles(session: AsyncSession, params: Annotated[VehicleQueryParamsSchema, Depends()], page: int, size: int):
     paramsdict = params.model_dump(exclude_none=True, exclude_unset=True)
+    offset_min = page * size
+    offset_max = (page + 1) * size
     print(paramsdict)
     stmt = select(VehicleModel)
     if 'brand' in paramsdict:
@@ -32,7 +31,7 @@ async def get_vehicles(session: AsyncSession, params: Annotated[VehicleQueryPara
         stmt = stmt.where(VehicleModel.price <= paramsdict['max_price'])
                 
     result: Result = await session.execute(stmt)
-    vehicles = result.scalars().all()
+    vehicles = result.scalars().all()[offset_min:offset_max]
     return list(vehicles)
 
 

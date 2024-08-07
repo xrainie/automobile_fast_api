@@ -10,7 +10,7 @@ from core.db_helper import get_db
 from .schemas import VehicleSchema, CreateVehicleSchema
 
 
-router = APIRouter(tags=['vehicle'])
+router = APIRouter(tags=['vehicle'], prefix='/api/cars')
 
 
 @router.get('/', response_model=list[VehicleSchema])
