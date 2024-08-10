@@ -5,17 +5,17 @@ from typing import Annotated, Optional
 
 
 class FuelTypes(str, Enum):
-    Petrol = "бензин"
-    Diesel = "дизель"
-    Hybrid = "гибрид"
-    Electricity = "электричество"
+    Petrol = "Бензин"
+    Diesel = "Дизель"
+    Hybrid = "Гибрид"
+    Electricity = "Электричество"
 
 
 class GearBox(str, Enum):
-    Mechanical = "механика"
-    Auto = "автоматическая"
-    Variator = "вариатор"
-    Robot = "робот"
+    Mechanical = "Механика"
+    Auto = "Автоматическая"
+    Variator = "Вариатор"
+    Robot = "Робот"
 
 
 class VehicleBase(BaseModel):
@@ -32,11 +32,22 @@ class CreateVehicleSchema(VehicleBase):
 
 
 class VehicleSchema(VehicleBase):
-    price: int = Field(gt=1)
+    price: int = Field(ge=0)
     id: int
 
 
 class VehicleQueryParamsSchema(VehicleBase):
+    brand: str | None = None
+    model: str | None = None
+    year_of_issue:int | None = Field(gt=1949, lt=datetime.now().year, title="Год выпуска автомобиля", default=None)
+    fuel: FuelTypes | None = None
+    gearbox: GearBox | None = None
+    mileage: int | None = Field(ge=0, title="Пробег автомобиля", default=None)
+    min_price: int | None = Field(ge=0, default=None)
+    max_price: int | None = Field(default=None)
+
+
+class VehicleUpdatePartial(CreateVehicleSchema):
     brand: str | None = None
     model: str | None = None
     year_of_issue:int | None = Field(gt=1949, lt=datetime.now().year, title="Год выпуска автомобиля", default=None)

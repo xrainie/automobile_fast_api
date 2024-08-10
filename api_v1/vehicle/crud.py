@@ -1,16 +1,17 @@
+from ast import stmt
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.engine import Result
-from .schemas import VehicleQueryParamsSchema, VehicleSchema, CreateVehicleSchema
+from .schemas import VehicleQueryParamsSchema, VehicleSchema, CreateVehicleSchema, VehicleUpdatePartial
 from core.models import VehicleModel
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Query, status
 from typing import Annotated
 
 
-async def get_vehicles(session: AsyncSession, params: Annotated[VehicleQueryParamsSchema, Depends()], page: int, size: int):
+async def get_vehicles(session: AsyncSession, params: Annotated[VehicleQueryParamsSchema, Depends()]):
     paramsdict = params.model_dump(exclude_none=True, exclude_unset=True)
-    offset_min = page * size
-    offset_max = (page + 1) * size
+    # offset_min = page * size
+    # offset_max = (page + 1) * size
     print(paramsdict)
     stmt = select(VehicleModel)
     if 'brand' in paramsdict:
@@ -31,7 +32,7 @@ async def get_vehicles(session: AsyncSession, params: Annotated[VehicleQueryPara
         stmt = stmt.where(VehicleModel.price <= paramsdict['max_price'])
                 
     result: Result = await session.execute(stmt)
-    vehicles = result.scalars().all()[offset_min:offset_max]
+    vehicles = result.scalars().all()
     return list(vehicles)
 
 
@@ -40,3 +41,14 @@ async def create_vehicle(session: AsyncSession, vehicle: CreateVehicleSchema) ->
     session.add(vehicle_inst)
     await session.commit()
     return vehicle_inst
+
+
+async def get_vehicle(session: AsyncSession, id: int) -> VehicleSchema:
+    return await session.get(VehicleModel, id)
+
+
+async def update_vehicle(session: AsyncSession, vehicle: VehicleSchema, vehicle_update: CreateVehicleSchema | VehicleUpdatePartial, partial: bool = True) -> VehicleSchema:
+    for name, value in vehicle_update.model_dump(exclude_unset=partial).items():
+        setattr(vehicle, name, value)
+    await session.commit()
+    return vehicle
